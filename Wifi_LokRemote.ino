@@ -8,22 +8,24 @@
 // Partition: 1MB PROG, 3MB SPIFFS
 // PSRAM: Disabled
 //--------------------------------
-//PINout
-// D19: DRV8871 IN1
-// D21: DRV8871 IN2
-//MAX98357A I2S Amp
-// D26: BCLK
-// D25: LRC
-// D22: DIN
+//PINout See globals.h
+//MAX98357A I2S Amp PINout Modified in source of driver C:\Users\cyber\OneDrive\Documenten\PlatformIO\Projects\230801-225104-esp32doit-devkit-v1\.pio\libdeps\esp32doit-devkit-v1\ESP8266Audio\src
 //--------------------------------
 
+//Upload of the wav files in data: https://randomnerdtutorials.com/esp32-vs-code-platformio-spiffs/
+//Click PlatformIO icon
+//Expand Project Tasks
+//Click lilygo-t-display-s3
+//Expand the Platform menu.
+//Click Build Filesystem image
+//Click Upload Filesystem Image.
 #include <WiFi.h>
 #include <WebServer.h>
 #include "WiFiUdp.h"
 #include "SPIFFS.h"
 #include <ArduinoJson.h>
 
-#include "AudioFileSourceSPIFFS.h"
+#include "AudioFileSourceSPIFFS.h" //Needs ESP8266Audio lib
 #include "AudioFileSourceID3.h"
 #include "AudioGeneratorWAV.h"
 #include "AudioOutputI2SNoDAC.h"
@@ -64,13 +66,13 @@ bool loadConfiguration(const char *filename, Config &config, String localjson) {
   if (localjson=="") {
   // Set config defaults before anything
     Serial.println("== Building object");
-    strlcpy(config.loconame,"LocoRemote",64);
+    strlcpy(config.loconame,"PrintABlokLoco",64);
     strlcpy(config.wifimode,"ap",10);
-    strlcpy(config.ssid,"LocoRemote",30);
+    strlcpy(config.ssid,"PrintABlokLoco",30);
     strlcpy(config.password,"12345678",30);
     config.acceleration = 100;
     config.deceleration = 100;
-    config.minspeed = 135;
+    config.minspeed = 180;
     config.maxspeed = 255;
     config.volume = 2;
     strlcpy(config.audio1,"Bell",20);
@@ -632,14 +634,24 @@ void setup() {
   pinMode(INPUT2, INPUT_PULLUP);
   pinMode(INPUT3, INPUT);
   pinMode(INPUT4, INPUT);
+  pinMode(FAULT, INPUT); // DRV8833 module ULT = nFAULT = input
+  pinMode(SD_MODE, INPUT); //?todo don't use SD_MODE
+  
+  // DRV8833 Sleepmode OFF
+  pinMode(NSLEEP, OUTPUT);
+  digitalWrite(NSLEEP, HIGH);
 
+
+  //digitalWrite(SD_MODE, HIGH); //MAX98357A  TODO ? Not in sleep mode ?
+
+  
 
   ledcAttachPin(MOTORIN1,0);  // assign the speed control PWM pin to a channel
   ledcAttachPin(MOTORIN2,1);  // assign the speed control PWM pin to a channel
    
   // initialize channel 0-15, resolution 1-16 bit, frequency limit depend on resolution
   ledcSetup(0,PWMFREQ,8);  // channel- 0, frequency- 4000, Resolution bit- 8
-  ledcSetup(1,PWMFREQ,8);  // channel- 0, frequency- 4000, Resolution bit- 8
+  ledcSetup(1,PWMFREQ,8);  // channel- 1, frequency- 4000, Resolution bit- 8
 
    
   uptime = 0;
@@ -764,10 +776,12 @@ void setup() {
 void codeForAudioTask( void * parameter ) {
 
   for (;;) {
+    #if 0 //Sake
     TIMERG0.wdt_wprotect=TIMG_WDT_WKEY_VALUE;
     TIMERG0.wdt_feed=1;
     TIMERG0.wdt_wprotect=0;
-
+    #endif
+    
     if (wav->isRunning()) {
       if (!wav->loop()) wav->stop();
     } else {
@@ -902,7 +916,9 @@ void loop() {
     }
 
       // Battery level check
-      battery = (float)analogRead(BATTERYMONITOR) / 4096 * 33 * 11111 / 11000 * 1.1;
+      //battery = (float)analogRead(BATTERYMONITOR) / 4096 * 33 * 11111 / 11000 * 1.1;
+      //4096 = 12 bit converter, 3300 mV = Full range,  factor 2 because the voltage divider 10k 10k
+      battery = (float)analogRead(BATTERYMONITOR) * 3300 / 4096 * 2;
   
       //Battery average calculation - average the last 10 readings
       if (battarrcount<BATTARRSIZE-1) {
@@ -1003,7 +1019,14 @@ void loop() {
 
 
 
-    byte statuspacket[10] = {(byte)((int)(battery*10)/256),(byte)((int)(battery*10)%256),(byte)((int)(abs(m1current)*10)/256),(byte)((int)(abs(m1current)*10)%256),m1temp,(byte)((int)(abs(m2current)*10)/256),(byte)((int)(abs(m2current)*10)%256),m2temp,0,0}; 
+    byte statuspacket[10] = {(byte)((int)(battery*10)/256),
+                             (byte)((int)(battery*10)%256),
+                             (byte)((int)(abs(m1current)*10)/256),
+                             (byte)((int)(abs(m1current)*10)%256),
+                             m1temp,
+                             (byte)((int)(abs(m2current)*10)/256),
+                             (byte)((int)(abs(m2current)*10)%256),m2temp,0,0}; 
+                             
     udp.beginPacket(udp.remoteIP(), 4445);  // udp.remotePort());
     udp.write(statuspacket,10);
     udp.endPacket();
@@ -1015,4 +1038,4 @@ void loop() {
   }
 
 
-}
+} //end loop()

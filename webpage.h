@@ -202,7 +202,7 @@ function getStatus() {
         document.getElementById("targetspeed").innerHTML = myarr.targetspeed;
         document.getElementById("slidespeed").value = myarr.targetspeed;
         document.getElementById("uptime").innerHTML = myarr.uptime;
-        document.getElementById("battery").innerHTML = myarr.battery + " V";
+        document.getElementById("battery").innerHTML = myarr.battery + " mV";
         if (myarr.direction==0) {
           document.getElementById("forward").className = "button_inactive";
           document.getElementById("reverse").className = "button_active";

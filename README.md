@@ -4,7 +4,7 @@ This project is a wifi controller for large scale garden railway locomotives. It
 I have also designed a wifi throttle for this controller, so it can be controlled from a physical throttle instead of a mobile phone: https://github.com/nygma2004/Wifi_Throttle
 
 ## Main Features
-- Wifi microcontroller generates its own wifi network, or connects to yout home wifi network and hosts the webpage control your loco
+- Wifi microcontroller generates its own wifi network, or connects to your home wifi network and hosts the webpage control your loco
 - Supply voltage from 6V to 24V
 - 3.6A motor controller
 - Built in sounds (horns, whistles, bells, station announcement, etc)

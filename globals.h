@@ -1,16 +1,19 @@
-#define BUILTIN_LED 2
-#define MOTORIN1 19                   // IN1 input of the DRV8871 motor driver board
-#define MOTORIN2 21                   // IN2 input of the DRV8871 motor driver board
+#define BUILTIN_LED 38
+#define MOTORIN1 40                   // 19 IN1 input of the DRV8871 motor driver board
+#define MOTORIN2 39                   // 21 IN2 input of the DRV8871 motor driver board
 #define PWMFREQ 15000                 // PWM frequency
-#define LIGHT1 4                      // Light output 1: headlights
-#define LIGHT2 5                      // Light output 2: headlights
-#define LIGHT3 18                     // Light output 3
-#define LIGHT4 23                     // Light output 4
-#define BATTERYMONITOR 36             // Analoge input for battery voltage reading
-#define INPUT1 32                     // Input 1: sound trigger
-#define INPUT2 33                     // Input 2: sound trigger
-#define INPUT3 34                     // Input 3: station stop trigger
-#define INPUT4 35                     // Input 4: terminus stop trigger
+#define LIGHT1 38                     // 4 Light output 1: headlights
+#define LIGHT2 38                     // 5 Light output 2: headlights
+#define LIGHT3 38                     // 18 Light output 3
+#define LIGHT4 38                     // 19 Light output 4
+#define BATTERYMONITOR 4              // 36 Analog input for battery voltage reading
+#define INPUT1 1                      // 32 Input 1: sound trigger
+#define INPUT2 2                      // 33 Input 2: sound trigger
+#define INPUT3 3                      // 34 Input 3: station stop trigger
+#define INPUT4 10                     // 35 Input 4: terminus stop trigger
+#define NSLEEP 16                     // nSleep connected to EEP of DRV8833 module
+#define FAULT  15                     // FAULT output connected to ULT of DRV8833 module
+#define SD_MODE 41                    // SD/MODE pin of the MAX98357A Shutdown and Channel Select. Pull SD_MODE low to place the device in shutdown.
 
 #define INPUTDEBOUNCE 250             // input software debounce delay
 #define DRIVEMODE_DRIVING 0           // Shuttle mode: loco is driving, waiting for a station of terminus stop trigger
